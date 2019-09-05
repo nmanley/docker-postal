@@ -1,0 +1,26 @@
+version: '1'
+
+services: 
+	docker-postal:
+		build:
+			context: .
+			dockerfile: Dockerfile
+		image: docker-postal
+		container_name: docker-postal
+		restart: unless-stopped
+		networks:
+			- postal-network
+		depends_on:
+			- database
+
+volumes:
+	postal-stor:
+	database:
+		driver: local
+		driver_opts: 
+			type: none
+			device: /opt/postal
+
+networks:
+	postal-network:
+		driver: bridge

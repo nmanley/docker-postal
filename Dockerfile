@@ -66,9 +66,22 @@ RUN postal bundle /opt/postal/vendor/bundle \
 
 RUN cp /opt/postal/app/resource/nginx.cfg /etc/nginx/sites-available/default \
         && mkdir /etc/nginx/ssl/ \
-        && openssl req -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/postal.key -out /etc/nginx/ssl/postal.cert -days 365 -nodes -subj "/C=GB/ST=${POSTAL_NAME}/L=${POSTAL_NAME}/O=${POSTAL_NAME}/CN=${POSTAL_DOMAIN}" \
+        && openssl req -x509 -newkey rsa:4096 -keyout /etc/nginx/ssl/postal.key -out /etc/nginx/ssl/postal.cert -days 365 -nodes -subj "/C=GB/ST=${POSTAL_NAME}/L=${POSTAL_NAME}/O=${POSTAL_NAME}/CN=${POSTAL_SUBDOMAIN}.${POSTAL_DOMAIN}" \
         && nginx reload
 
+COPY nginx.conf /etc/nginx/sites-available/nginx.conf
+RUN sed -i "s/{http_v4_ip}/${HTTP_V4_IP}/" /etc/nginx/sites-available/nginx.conf \
+        && sed -i "s/{http_v4_port}/${HTTP_V4_PORT}" /etc/nginx/sites-available/nginx.conf \
+        && sed -i "s/{postal_subdomain}/${POSTAL_SUBDOMAIN}" /etc/nginx/sites-available/nginx.conf \
+        && sed -i "s/{postal_domain}/${POSTAL_DOMAIN}" /etc/nginx/sites-available/nginx.conf
+
+COPY nginx-ssl.conf /etc/nginx/sites-available/nginx.conf
+RUN sed -i "s/{http_v4_ip}/${HTTP_V4_IP}/" /etc/nginx/sites-available/nginx.conf \
+        && sed -i "s/{http_v4_port}/${HTTP_V4_PORT}" /etc/nginx/sites-available/nginx.conf \
+        && sed -i "s/{postal_subdomain}/${POSTAL_SUBDOMAIN}" /etc/nginx/sites-available/nginx.conf \
+        && sed -i "s/{postal_domain}/${POSTAL_DOMAIN}" /etc/nginx/sites-available/nginx.conf
+
+COPY docker-entrypoint.sh /entrypoint.sh
 RUN ["chmod", "+x", "/entrypoint.sh"]
 ENTRYPOINT ["/entrypoint.sh"]
 
