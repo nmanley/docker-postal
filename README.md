@@ -1,1 +1,1 @@
-# docker-postal
+# A docker port for Atech/postal
