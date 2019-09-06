@@ -2,6 +2,13 @@ version: '3'
 
 services:
   docker-postal:
+    environment:
+        - POSTAL_DOMAIN=mail.impruvit1.com
+        - DB_HOSTNAME=database
+        - DB_PORT=3306
+        - DB_USERNAME=postal
+        - DB_PASSWORD=postal
+        - DB_DATABASE=postal
     build:
       context: .
       dockerfile: Dockerfile
